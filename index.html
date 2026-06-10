@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>京都 × 大阪 7日行程</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; background: #F7F6F2; color: #1A1A1A; font-size: 15px; }
+
+  .hero { background: #0F6E56; color: white; padding: 28px 20px 20px; }
+  .hero h1 { font-size: 22px; font-weight: 500; letter-spacing: -0.3px; }
+  .hero p { font-size: 13px; opacity: 0.75; margin-top: 4px; }
+  .hero-dates { display: flex; gap: 12px; margin-top: 14px; }
+  .hero-badge { background: rgba(255,255,255,0.15); border-radius: 20px; padding: 4px 12px; font-size: 12px; }
+
+  .nav { background: white; border-bottom: 0.5px solid #E0DED8; position: sticky; top: 0; z-index: 10; }
+  .nav-tabs { display: flex; overflow-x: auto; scrollbar-width: none; padding: 0 12px; gap: 4px; }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .tab-btn { flex-shrink: 0; padding: 12px 10px; font-size: 12px; font-weight: 500; color: #888; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: color .15s, border-color .15s; }
+  .tab-btn.active-kyoto { color: #0F6E56; border-bottom-color: #0F6E56; }
+  .tab-btn.active-osaka { color: #534AB7; border-bottom-color: #534AB7; }
+  .tab-btn.active-flight { color: #854F0B; border-bottom-color: #854F0B; }
+
+  .content { padding: 16px; max-width: 500px; margin: 0 auto; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .flight-card { background: #FAEEDA; border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; }
+  .flight-card.return { background: #EAF3DE; }
+  .flight-route { font-size: 18px; font-weight: 500; color: #412402; }
+  .flight-card.return .flight-route { color: #27500A; }
+  .flight-detail { font-size: 13px; color: #854F0B; margin-top: 4px; }
+  .flight-card.return .flight-detail { color: #3B6D11; }
+  .flight-meta { font-size: 12px; color: #854F0B; margin-top: 8px; opacity: 0.8; }
+  .flight-card.return .flight-meta { color: #3B6D11; }
+
+  .day-header { margin-bottom: 14px; }
+  .day-label { font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 4px; }
+  .day-label.kyoto { color: #0F6E56; }
+  .day-label.osaka { color: #534AB7; }
+  .day-title { font-size: 19px; font-weight: 500; color: #1A1A1A; line-height: 1.3; }
+  .day-sub { font-size: 13px; color: #888; margin-top: 3px; }
+
+  .item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 0.5px solid #EDEBE5; align-items: flex-start; }
+  .item:last-child { border-bottom: none; }
+  .item-time { font-size: 11px; color: #AAA; min-width: 36px; padding-top: 3px; flex-shrink: 0; }
+  .item-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .dot-kyoto { background: #1D9E75; }
+  .dot-osaka { background: #7F77DD; }
+  .dot-amber { background: #BA7517; }
+  .item-body { flex: 1; }
+  .item-name { font-size: 14px; font-weight: 500; color: #1A1A1A; line-height: 1.4; }
+  .item-desc { font-size: 12px; color: #888; margin-top: 2px; line-height: 1.5; }
+  .warn { font-size: 12px; color: #993C1D; margin-top: 3px; display: flex; align-items: flex-start; gap: 4px; }
+
+  .note-card { background: white; border-radius: 12px; padding: 14px 16px; margin-top: 16px; border: 0.5px solid #E0DED8; }
+  .note-title { font-size: 12px; font-weight: 500; color: #888; margin-bottom: 8px; }
+  .note-text { font-size: 13px; color: #444; line-height: 1.6; }
+
+  .todo-section { margin-top: 20px; }
+  .todo-title { font-size: 14px; font-weight: 500; color: #1A1A1A; margin-bottom: 10px; }
+  .todo-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; background: white; border-radius: 10px; border: 0.5px solid #E0DED8; margin-bottom: 6px; cursor: pointer; }
+  .todo-item.done { opacity: 0.5; }
+  .todo-check { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #CCC; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+  .todo-item.done .todo-check { background: #1D9E75; border-color: #1D9E75; }
+  .todo-check-inner { width: 8px; height: 8px; background: white; border-radius: 50%; display: none; }
+  .todo-item.done .todo-check-inner { display: block; }
+  .todo-text { font-size: 13px; color: #1A1A1A; flex: 1; line-height: 1.5; }
+  .todo-item.done .todo-text { text-decoration: line-through; color: #AAA; }
+  .todo-sub { font-size: 11px; color: #AAA; margin-top: 2px; }
+
+  .pack-section { margin-top: 0; }
+  .pack-cat { font-size: 12px; font-weight: 500; color: #888; margin: 16px 0 8px; letter-spacing: .04em; }
+  .pack-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: white; border-radius: 10px; border: 0.5px solid #E0DED8; margin-bottom: 6px; cursor: pointer; }
+  .pack-item.checked { opacity: 0.45; }
+  .pack-box { width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid #CCC; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+  .pack-item.checked .pack-box { background: #534AB7; border-color: #534AB7; }
+  .pack-check { display: none; width: 10px; height: 10px; }
+  .pack-item.checked .pack-check { display: block; }
+  .pack-text { font-size: 13px; color: #1A1A1A; }
+  .pack-item.checked .pack-text { text-decoration: line-through; color: #AAA; }
+
+  .progress-bar { height: 4px; background: #E0DED8; border-radius: 2px; margin: 12px 0 4px; }
+  .progress-fill { height: 100%; background: #534AB7; border-radius: 2px; transition: width .3s; }
+  .progress-label { font-size: 12px; color: #888; text-align: right; }
+
+  .transport-card { background: #F1EFE8; border-radius: 10px; padding: 10px 14px; margin: 12px 0; }
+  .transport-text { font-size: 13px; color: #5F5E5A; }
+  .transport-text strong { color: #2C2C2A; font-weight: 500; }
+
+  .section-divider { display: flex; align-items: center; gap: 10px; margin: 20px 0 14px; }
+  .section-divider span { font-size: 11px; color: #AAA; white-space: nowrap; }
+  .section-divider::before, .section-divider::after { content: ''; flex: 1; height: 0.5px; background: #E0DED8; }
+
+  .rest-section { margin-top: 18px; }
+  .rest-title { font-size: 12px; font-weight: 500; color: #888; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .rest-title::before { content: ''; flex: 1; height: 0.5px; background: #E0DED8; }
+  .rest-title::after { content: ''; flex: 1; height: 0.5px; background: #E0DED8; }
+  .rest-card { background: white; border-radius: 10px; border: 0.5px solid #E0DED8; padding: 10px 12px; margin-bottom: 6px; }
+  .rest-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .rest-name { font-size: 13px; font-weight: 500; color: #1A1A1A; }
+  .rest-meal { font-size: 10px; padding: 2px 8px; border-radius: 8px; flex-shrink: 0; margin-top: 1px; }
+  .meal-lunch { background: #E1F5EE; color: #0F6E56; }
+  .meal-dinner { background: #EEEDFE; color: #534AB7; }
+  .meal-both { background: #FAEEDA; color: #854F0B; }
+  .rest-desc { font-size: 12px; color: #888; margin-top: 3px; line-height: 1.5; }
+  .rest-price { font-size: 11px; color: #AAA; margin-top: 3px; }
+  .rest-tags { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
+  .tag-noseafood { font-size: 10px; padding: 1px 7px; border-radius: 8px; background: #EAF3DE; color: #3B6D11; }
+  .tag-seafood { font-size: 10px; padding: 1px 7px; border-radius: 8px; background: #E6F1FB; color: #185FA5; }
+  .tag-both { font-size: 10px; padding: 1px 7px; border-radius: 8px; background: #FAEEDA; color: #854F0B; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>京都 × 大阪 7日行程</h1>
+  <p>家庭旅遊 · 2026</p>
+  <div class="hero-dates">
+    <span class="hero-badge">7/21 出發</span>
+    <span class="hero-badge">7/28 返台</span>
+    <span class="hero-badge">4人同行</span>
+  </div>
+</div>
+
+<div class="nav">
+  <div class="nav-tabs">
+    <button class="tab-btn active-flight" onclick="show('flight')">航班</button>
+    <button class="tab-btn" onclick="show('d1')">Day 1</button>
+    <button class="tab-btn" onclick="show('d2')">Day 2</button>
+    <button class="tab-btn" onclick="show('d3')">Day 3</button>
+    <button class="tab-btn" onclick="show('d4')">Day 4</button>
+    <button class="tab-btn" onclick="show('d5')">Day 5</button>
+    <button class="tab-btn" onclick="show('d6')">Day 6</button>
+    <button class="tab-btn" onclick="show('d7')">Day 7</button>
+    <button class="tab-btn" onclick="show('todo')">預訂</button>
+    <button class="tab-btn" onclick="show('pack')">行李</button>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="panel active" id="panel-flight">
+    <div style="height:8px"></div>
+    <div class="flight-card">
+      <div class="flight-route">桃園 → 關西</div>
+      <div class="flight-detail">JX820 · 08:30 起飛 → 12:15 落地</div>
+      <div class="flight-meta">7/21（週二） · 飛行2小時45分 · T1</div>
+    </div>
+    <div class="transport-card">
+      <div class="transport-text">落地後搭 <strong>HARUKA 特急</strong>（約75分）→ 13:30 抵達京都<br>行李先寄放 Good Nature Hotel，輕裝出發</div>
+    </div>
+    <div style="height:16px"></div>
+    <div class="flight-card return">
+      <div class="flight-route" style="color:#27500A">關西 → 桃園</div>
+      <div class="flight-detail">JX823 · 15:10 起飛 → 17:05 落地</div>
+      <div class="flight-meta">7/28（週二） · 飛行2小時55分 · T1</div>
+    </div>
+    <div class="transport-card">
+      <div class="transport-text"><strong>12:00 前</strong>出發前往關西機場，預留充裕時間</div>
+    </div>
+    <div class="note-card">
+      <div class="note-title">住宿資訊</div>
+      <div class="note-text">
+        <strong>京都 4晚</strong>（7/21–7/25）<br>Good Nature Hotel Kyoto<br>Check-in 15:00 · Check-out 11:00<br><br>
+        <strong>大阪 3晚</strong>（7/25–7/28）<br>The Gate Hotel 大阪 by HULIC<br>Check-in 15:00 · Check-out 11:00
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-d1">
+    <div style="height:8px"></div>
+    <div class="day-header">
+      <div class="day-label kyoto">京都 · Day 1</div>
+      <div class="day-title">抵達 · 錦市場 · 宵山</div>
+      <div class="day-sub">7月21日（週二）</div>
+    </div>
+    <div class="item">
+      <div class="item-time">14:00</div>
+      <div class="item-dot dot-kyoto"></div>
+      <div class="item-body">
+        <div class="item-name">錦市場</div>
+        <div class="item-desc">京都廚房，各式小吃邊走邊吃，醃漬物、串燒、抹茶甜點</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">15:00</div>
+      <div class="item-dot dot-amber"></div>
+      <div class="item-body">
+        <div class="item-name">Check-in Good Nature Hotel</div>
+        <div class="item-desc">取回寄放行李，整頓後出發</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">傍晚</div>
+      <div class="item-dot dot-kyoto"></div>
+      <div class="item-body">
+        <div class="item-name">祇園 × 花見小路</div>
+        <div class="item-desc">傳統藝妓町，石板路小巷，傍晚氣氛最美</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">晚上</div>
+      <div class="item-dot dot-kyoto"></div>
+      <div class="item-body">
+        <div class="item-name">宵山（四條烏丸）</div>
+        <div class="item-desc">祇園祭山鉾花車點燈展示，整條街封路成步行區，攤販熱鬧，祭典氣氛濃厚</div>
+      </div>
+    </div>
+    <div class="note-card">
+      <div class="note-title">提醒</div>
+      <div class="note-text">宵山 7/21–7/23 每晚都有，不用特地安排，晚餐後散步過去即可</div>
+    </div>
+    <div class="rest-section">
+      <div class="rest-title">今日推薦餐廳</div>
+      <div class="rest-card">
+        <div class="rest-header"><div class="rest-name">錦市場 食べ歩き</div><span class="rest-meal meal-lunch">午餐</span></div>
+        <div class="rest-desc">邊走邊吃就是最好的午餐。玉子燒、醃漬物、串燒、抹茶冰淇淋，一條街吃飽。海鮮與非海鮮選擇都有</div>
+        <div class="rest-tags"><span class="tag-both">海鮮可選</span></div>
+        <div class="rest-price">約 500–1,500 JPY/人</div>
+      </div>
+      <div class="rest-card">
+        <div class="rest-header"><div class="rest-name">先斗町 小元</div><span class="rest-meal meal-dinner">晚餐</span></div>
+        <div class="rest-desc">鴨川旁窄巷，招牌使用丹波黑雞料理，可指定以雞肉為主的菜色。職人歷25年，有堀炬燵座位，祇園祭期間氣氛絕佳</div>
+        <div class="rest-tags"><span class="tag-both">可指定雞肉菜色</span></div>
+        <div class="rest-price">約 4,000–8,000 JPY/人</div>
+      </div>
+      <div class="rest-card">
+        <div class="rest-header"><div class="rest-name">祇園 スコルピオーネ</div><span class="rest-meal meal-dinner">晚餐</span></div>
+        <div class="rest-desc">祇園的義大利料理，使用京野菜與黑毛和牛，全6品套餐包含牛肉主菜，完全不依賴海鮮。適合第一晚輕鬆用餐</div>
+        <div class="rest-tags"><span class="tag-noseafood">無海鮮</span></div>
+        <div class="rest-price">約 8,000 JPY/人</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-d2">
+    <div style="height:8px"></div>
+    <div class="day-header">
+      <div class="day-label kyoto">京都 · Day 2</div>
+      <div class="day-title">天橋立 × 伊根舟屋</div>
+      <div class="day-sub">7月22日（週三）· 海之京都</div>
+    </div>
+    <div class="item">
+      <div class="item-time">08:30</div>
+      <div class="item-dot dot-amber"></div>
+      <div class="item-body">
+        <div class="item-name">京都站出發</div>
+        <div class="item-desc">搭JR特急前往西舞鶴（約1小時40分）</div>
+        <div class="warn">⚠ 需趕上10:13丹後赤松號，務必08:30前出發</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">10:13</div>
+      <div class="item-dot dot-kyoto"></div>
+      <div class="item-body">
+        <div class="item-name">丹後赤松號出發（西舞鶴）</div>
+        <div class="item-desc">京都丹後鐵道觀光列車，Bus No. 8771D</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">11:01</div>
+      <div class="item-dot dot-kyoto"></div>
+      <div class="item-body">
+        <div class="item-name">抵達天橋立</div>
+        <div class="item-desc">日本三景之一，松樹綿延的細長沙洲橫跨宮津灣</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">下午</div>
+      <div class="item-dot dot-kyoto"></div>
+      <div class="item-body">
+        <div class="item-name">天橋立股覽</div>
+        <div class="item-desc">搭纜車或升降機上山，俯瞰天橋立全景，傳統「股覽」倒著看最特別</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">下午</div>
+      <div class="item-dot dot-kyoto"></div>
+      <div class="item-body">
+        <div class="item-name">伊根灣舟屋遊船</div>
+        <div class="item-desc">江戶時代的漁村舟屋直接建在海面上，搭船遊覽最有感，餵海鷗也很有趣</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">晚上</div>
+      <div class="item-dot dot-amber"></div>
+      <div class="item-body">
+        <div class="item-name">搭車回京都</div>
+        <div class="item-desc">輕鬆晚餐休息</div>
+      </div>
+    </div>
+    <div class="note-card">
+      <div class="note-title">交通提醒</div>
+      <div class="note-text">丹後赤松號票已在WILLER預訂（800 JPY/人）<br>京都→西舞鶴 JR特急票需另外預訂，Manaca可刷運賃，特急券需另購</div>
+    </div>
+    <div class="rest-section">
+      <div class="rest-title">今日推薦餐廳</div>
+      <div class="rest-card">
+        <div class="rest-header"><div class="rest-name">すえひろ</div><span class="rest-meal meal-lunch">午餐</span></div>
+        <div class="rest-desc">宮津市內的中華食堂，雖然也有海鮮但招牌是擔擔麵與柚子胡椒鹽拉麵，都是非海鮮選項。擔擔麵濃郁芝麻湯頭評價極高，約830 JPY</div>
+        <div class="rest-tags"><span class="tag-both">有非海鮮選項</span></div>
+        <div class="rest-price">約 800–1,500 JPY/人</div>
+      </div>
+      <div class="rest-card">
+        <div class="rest-header"><div class="rest-name">龍宮そば</div><span class="rest-meal meal-lunch">午餐</span></div>
+        <div class="rest-desc">伊根町筒川產蕎麥粉八成手打蕎麥，香氣絕佳，完全無海鮮。文珠御膳套餐1,660 JPY含小菜。位於天橋立文珠地區，觀景後直接步行可達</div>
+        <div class="rest-tags"><span class="tag-noseafood">無海鮮</span></div>
+        <div class="rest-price">約 1,000–1,800 JPY/人</div>
+      </div>
+      <div class="rest-card">
+        <div class="rest-header"><div class="rest-name">Cafe du Pin</div><span class="rest-meal meal-both">輕食/下午茶</span></div>
+        <div class="rest-desc">知恩寺旁的咖啡廳，可眺望海景，提供三明治、咖啡套餐，日替わりランチ附咖啡1,500 JPY。天橋立觀景後的最佳休息點，完全無海鮮</div>
+        <div class="rest-tags"><span class="tag-noseafood">無海鮮</span></div>
+        <div class="rest-price">約 1,000–1,500 JPY/人</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-d3">
+    <div style="height:8px"></div>
+    <div class="day-header">
+      <div class="day-label kyoto">京都 · Day 3</div>
+      <div class="day-title">嵯峨野小火車 × 保津川遊船</div>
+      <div class="day-sub">7月23日（週四）· 峽谷自然體驗</div>
+    </div>
+    <div class="item">
+      <div class="item-time">08:30</div>
+      <div class="item-dot dot-kyoto"></div>
+      <div class="item-body">
+        <div class="item-name">嵯峨野觀光小火車</div>
+        <div class="item-desc">嵯峨站出發，復古列車沿保津川峽谷行駛，全長約7公里，山景絕美</div>
+        <div class="warn">⚠ 務必提前1個月在KKday或官網預購！暑假超搶手</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">10:30</div>
+      <div class="item-dot dot-kyoto"></div>
+      <div class="item-body">
+        <div class="item-name">保津川遊船</div>
+        <div class="item-desc">從龜岡搭船漂流回嵐山，約2小時，穿越急流與峽谷，與小火車從不同角度看同一山谷</div>
+        <div class="warn">⚠ 提前預訂</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">下午</div>
+      <div class="item-dot dot-kyoto"></div>
+      <div class="item-body">
+        <div class="item-name">嵐山周邊輕鬆逛</div>
+        <div class="item-desc">渡月橋散步、抹茶甜點、紀念品，搭嵐電回京都市區</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">晚上</div>
+      <div class="item-dot dot-kyoto"></div>
+      <div class="item-body">
+        <div class="item-name">輕鬆晚餐</div>
+        <div class="item-desc">嵐山或京都四條一帶用餐</div>
+      </div>
+    </div>
+    <div class="note-card">
+      <div class="note-title">回程交通</div>
+      <div class="note-text">嵐山 → Good Nature Hotel：搭嵐電至四條大宮，再步行或計程車，約30–40分。Manaca 可直接感應搭乘。</div>
+    </div>
+    <div class="rest-section">
+      <div class="rest-title">今日推薦餐廳</div>
+      <div class="rest-card">
+        <div class="rest-header"><div class="rest-name">嵯峨とうふ稲 北店</div><span class="rest-meal meal-lunch">午餐</span></div>
+        <div class="rest-desc">嵯峨野名物湯葉料理。招牌「和牛すき焼き湯葉重」2,600 JPY，湯葉柔嫩與甜辛和牛絕配，完全無海鮮，是嵐山最有代表性的午餐</div>
+        <div class="rest-tags"><span class="tag-noseafood">無海鮮</span></div>
+        <div class="rest-price">約 2,000–3,500 JPY/人</div>
+      </div>
+      <div class="rest-card">
+        <div class="rest-header"><div class="rest-name">嵐山 喜重郎</div><span class="rest-meal meal-lunch">午餐</span></div>
+        <div class="rest-desc">京福嵐山站旁，使用上質和牛腰肉的「ステーキ重」，觀光途中的犒賞午餐首選。苔蘚庭院景色絕佳，完全無海鮮</div>
+        <div class="rest-tags"><span class="tag-noseafood">無海鮮</span></div>
+        <div class="rest-price">約 3,000–5,000 JPY/人</div>
+      </div>
+      <div class="rest-card">
+        <div class="rest-header"><div class="rest-name">嵐山よしむら</div><span class="rest-meal meal-both">午/晚餐</span></div>
+        <div class="rest-desc">渡月橋旁國產手打蕎麥，「渡月膳」套餐含蕎麥麵、豆腐、小菜，可邊眺望嵐山邊用餐。蕎麥麵無海鮮，景色絕佳</div>
+        <div class="rest-tags"><span class="tag-noseafood">無海鮮</span></div>
+        <div class="rest-price">約 1,500–2,500 JPY/人</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-d4">
+    <div style="height:8px"></div>
+    <div class="day-header">
+      <div class="day-label kyoto">京都 · Day 4</div>
+      <div class="day-title">後祭巡行 · 銀閣寺 · 哲學之道</div>
+      <div class="day-sub">7月24日（週五）· 祇園祭最高潮</div>
+    </div>
+    <div class="item">
+      <div class="item-time">08:30</div>
+      <div class="item-dot dot-amber"></div>
+      <div class="item-body">
+        <div class="item-name">抵達四條烏丸佔位</div>
+        <div class="item-desc">巡行9:30開始，提早到可佔好位置。可在Klook購買付費觀覽席免排隊</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">09:30</div>
+      <div class="item-dot dot-kyoto"></div>
+      <div class="item-body">
+        <div class="item-name">祇園祭後祭山鉾巡行</div>
+        <div class="item-desc">11台山鉾花車遊行，約12:00結束。是日本三大祭典高潮，花車最高達25公尺</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">下午</div>
+      <div class="item-dot dot-kyoto"></div>
+      <div class="item-body">
+        <div class="item-name">銀閣寺</div>
+        <div class="item-desc">正式名稱慈照寺，侘寂風格枯山水庭園，銀沙灘與向月台是一絕。門票500円</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">傍晚</div>
+      <div class="item-dot dot-kyoto"></div>
+      <div class="item-body">
+        <div class="item-name">哲學之道</div>
+        <div class="item-desc">從銀閣寺步行即達，沿琵琶湖疏水渠2公里散步道，兩側是咖啡廳、雜貨店、獨立書店</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">傍晚末</div>
+      <div class="item-dot dot-kyoto"></div>
+      <div class="item-body">
+        <div class="item-name">南禪寺水路閣</div>
+        <div class="item-desc">明治時代磚造水道橋嵌入日式庭園，歐式建築融合禪寺，非常獨特的打卡點</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">晚上</div>
+      <div class="item-dot dot-amber"></div>
+      <div class="item-body">
+        <div class="item-name">回飯店整理行李</div>
+        <div class="item-desc">明日11:00退房，今晚整理好行李</div>
+      </div>
+    </div>
+    <div class="rest-section">
+      <div class="rest-title">今日推薦餐廳</div>
+      <div class="rest-card">
+        <div class="rest-header"><div class="rest-name">道頓堀 今井</div><span class="rest-meal meal-lunch">巡行後午餐</span></div>
+        <div class="rest-desc">四條烏丸附近、創業1946年老字號烏龍麵店。出汁香氣濃郁，看完巡行後走路可達，是當地人也愛的名店</div>
+        <div class="rest-tags"><span class="tag-noseafood">無海鮮</span></div>
+        <div class="rest-price">約 1,000–1,500 JPY/人</div>
+      </div>
+      <div class="rest-card">
+        <div class="rest-header"><div class="rest-name">哲學之道沿線咖啡廳</div><span class="rest-meal meal-both">下午茶</span></div>
+        <div class="rest-desc">哲學之道沿途有多家獨立咖啡廳，推薦「La Voiture」法式點心或「文の助茶屋」抹茶甜品，散步途中隨意歇腳</div>
+        <div class="rest-tags"><span class="tag-noseafood">無海鮮</span></div>
+        <div class="rest-price">約 800–1,500 JPY/人</div>
+      </div>
+      <div class="rest-card">
+        <div class="rest-header"><div class="rest-name">南禪寺 順正 湯豆腐</div><span class="rest-meal meal-dinner">晚餐</span></div>
+        <div class="rest-desc">南禪寺名物，在竹林包廂內享用豆腐懷石，主角是京都豆腐，完全無海鮮。最後一晚京都的絕佳選擇，建議提前預約</div>
+        <div class="rest-tags"><span class="tag-noseafood">無海鮮</span></div>
+        <div class="rest-price">約 3,500–6,000 JPY/人</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-d5">
+    <div style="height:8px"></div>
+    <div class="day-header">
+      <div class="day-label osaka">大阪 · Day 5</div>
+      <div class="day-title">移動大阪 · HARUKAS · 新世界</div>
+      <div class="day-sub">7月25日（週六）</div>
+    </div>
+    <div class="item">
+      <div class="item-time">11:00</div>
+      <div class="item-dot dot-amber"></div>
+      <div class="item-body">
+        <div class="item-name">Good Nature Hotel 退房</div>
+        <div class="item-desc">Klook包車接送，行李直接放車上</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">11:30</div>
+      <div class="item-dot dot-amber"></div>
+      <div class="item-body">
+        <div class="item-name">包車出發 → 大阪</div>
+        <div class="item-desc">約1.5小時，13:00左右抵達 The Gate Hotel</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">13:00</div>
+      <div class="item-dot dot-amber"></div>
+      <div class="item-body">
+        <div class="item-name">行李寄放飯店，附近午餐</div>
+        <div class="item-desc">Check-in 15:00，先輕裝出去吃午餐</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">15:00</div>
+      <div class="item-dot dot-amber"></div>
+      <div class="item-body">
+        <div class="item-name">Check-in The Gate Hotel 大阪</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">下午</div>
+      <div class="item-dot dot-osaka"></div>
+      <div class="item-body">
+        <div class="item-name">阿倍野 HARUKAS 300 展望台</div>
+        <div class="item-desc">日本最高樓（300公尺），360度俯瞰大阪全景，天氣好可遠眺六甲山</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">傍晚</div>
+      <div class="item-dot dot-osaka"></div>
+      <div class="item-body">
+        <div class="item-name">新世界 × 通天閣</div>
+        <div class="item-desc">大阪最懷舊的昭和老街，串炸發源地，復古霓虹燈氣氛獨特，和道頓堀完全不同風情</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">晚上</div>
+      <div class="item-dot dot-osaka"></div>
+      <div class="item-body">
+        <div class="item-name">道頓堀夜景 × 晚餐</div>
+        <div class="item-desc">章魚燒、大阪燒、螃蟹道樂，體驗「食倒之都」夜晚</div>
+      </div>
+    </div>
+    <div class="rest-section">
+      <div class="rest-title">今日推薦餐廳</div>
+      <div class="rest-card">
+        <div class="rest-header"><div class="rest-name">串カツ いっとく 新世界店</div><span class="rest-meal meal-dinner">晚餐</span></div>
+        <div class="rest-desc">新世界串炸名店，30種以上炸串，肉類、蔬菜選擇豐富，完全可以不點海鮮。醬料禁止二度沾是規矩</div>
+        <div class="rest-tags"><span class="tag-both">可選無海鮮</span></div>
+        <div class="rest-price">約 1,500–2,500 JPY/人</div>
+      </div>
+      <div class="rest-card">
+        <div class="rest-header"><div class="rest-name">大阪燒 千房 道頓堀店</div><span class="rest-meal meal-dinner">晚餐</span></div>
+        <div class="rest-desc">大阪燒老字號，豬肉大阪燒與もんじゃ燒，可選純肉類口味完全不加海鮮。道頓堀夜景旁，現場鐵板烤製超有氣氛</div>
+        <div class="rest-tags"><span class="tag-both">可選豬肉口味</span></div>
+        <div class="rest-price">約 1,500–2,500 JPY/人</div>
+      </div>
+      <div class="rest-card">
+        <div class="rest-header"><div class="rest-name">はり重 道頓堀本店</div><span class="rest-meal meal-dinner">晚餐</span></div>
+        <div class="rest-desc">1919年創業老字號，以黑毛和牛すき焼き聞名，菜單完全以牛肉為主。道頓堀本店氣氛優雅，4人聚餐的高級選擇</div>
+        <div class="rest-tags"><span class="tag-noseafood">無海鮮</span></div>
+        <div class="rest-price">約 5,000–10,000 JPY/人</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-d6">
+    <div style="height:8px"></div>
+    <div class="day-header">
+      <div class="day-label osaka">大阪 · Day 6</div>
+      <div class="day-title">海遊館 · 天保山 · 心齋橋</div>
+      <div class="day-sub">7月26日（週日）</div>
+    </div>
+    <div class="item">
+      <div class="item-time">09:30</div>
+      <div class="item-dot dot-osaka"></div>
+      <div class="item-body">
+        <div class="item-name">海遊館</div>
+        <div class="item-desc">世界頂級水族館，鯨鯊主水槽震撼人心，可近距離欣賞各種海洋生物</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">午後</div>
+      <div class="item-dot dot-osaka"></div>
+      <div class="item-body">
+        <div class="item-name">天保山摩天輪</div>
+        <div class="item-desc">大阪港灣景致，天氣好視野極佳</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">下午</div>
+      <div class="item-dot dot-osaka"></div>
+      <div class="item-body">
+        <div class="item-name">心齋橋 × 美國村</div>
+        <div class="item-desc">藥妝、潮流品牌、百貨公司，大阪購物最佳地點</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">晚上</div>
+      <div class="item-dot dot-osaka"></div>
+      <div class="item-body">
+        <div class="item-name">難波晚餐</div>
+        <div class="item-desc">道地居酒屋料理，嘗試串炸、生魚片、大阪特色料理</div>
+      </div>
+    </div>
+    <div class="rest-section">
+      <div class="rest-title">今日推薦餐廳</div>
+      <div class="rest-card">
+        <div class="rest-header"><div class="rest-name">海遊館附設餐廳</div><span class="rest-meal meal-lunch">午餐</span></div>
+        <div class="rest-desc">館內餐廳有漢堡、咖哩飯、義大利麵等選項，可完全避開海鮮。海景座位參觀完直接用餐最方便</div>
+        <div class="rest-tags"><span class="tag-both">有非海鮮選項</span></div>
+        <div class="rest-price">約 1,000–2,000 JPY/人</div>
+      </div>
+      <div class="rest-card">
+        <div class="rest-header"><div class="rest-name">心齋橋 ステーキみやび</div><span class="rest-meal meal-dinner">晚餐</span></div>
+        <div class="rest-desc">心齋橋附近的鐵板燒和牛，使用A5黑毛和牛，現場鐵板料理表演，完全無海鮮。購物後的犒賞晚餐</div>
+        <div class="rest-tags"><span class="tag-noseafood">無海鮮</span></div>
+        <div class="rest-price">約 4,000–8,000 JPY/人</div>
+      </div>
+      <div class="rest-card">
+        <div class="rest-header"><div class="rest-name">難波 焼肉居酒屋</div><span class="rest-meal meal-dinner">晚餐</span></div>
+        <div class="rest-desc">難波千日前一帶燒肉居酒屋選擇多，生啤、和牛燒肉、炸雞，肉食派的最佳選擇。完全可以不碰海鮮</div>
+        <div class="rest-tags"><span class="tag-noseafood">無海鮮</span></div>
+        <div class="rest-price">約 2,000–3,500 JPY/人</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-d7">
+    <div style="height:8px"></div>
+    <div class="day-header">
+      <div class="day-label osaka">大阪 · Day 7</div>
+      <div class="day-title">梅田 · 最後採買</div>
+      <div class="day-sub">7月27日（週一）</div>
+    </div>
+    <div class="item">
+      <div class="item-time">上午</div>
+      <div class="item-dot dot-osaka"></div>
+      <div class="item-body">
+        <div class="item-name">梅田空中庭園展望台</div>
+        <div class="item-desc">大阪知名地標，360度俯瞰全市，建築本身也很有特色</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">下午</div>
+      <div class="item-dot dot-osaka"></div>
+      <div class="item-body">
+        <div class="item-name">Grand Front 大阪 × 阪急百貨</div>
+        <div class="item-desc">日本限定品、甜點、零食、伴手禮最後掃貨</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-time">晚上</div>
+      <div class="item-dot dot-osaka"></div>
+      <div class="item-body">
+        <div class="item-name">梅田地下街晚餐</div>
+        <div class="item-desc">大阪最大地下美食街，最後一頓大阪料理，好好享用</div>
+      </div>
+    </div>
+    <div class="rest-section">
+      <div class="rest-title">今日推薦餐廳</div>
+      <div class="rest-card">
+        <div class="rest-header"><div class="rest-name">梅田 肉料理 おか田</div><span class="rest-meal meal-lunch">午餐</span></div>
+        <div class="rest-desc">梅田一帶的牛肉料理，黑毛和牛ランチ套餐，燒肉或鐵板燒形式，最後一天的犒賞午餐。完全無海鮮</div>
+        <div class="rest-tags"><span class="tag-noseafood">無海鮮</span></div>
+        <div class="rest-price">約 2,500–4,000 JPY/人</div>
+      </div>
+      <div class="rest-card">
+        <div class="rest-header"><div class="rest-name">梅田 地下街美食</div><span class="rest-meal meal-dinner">最後晚餐</span></div>
+        <div class="rest-desc">梅田地下街（ホワイティうめだ）大阪燒、燒肉、拉麵、居酒屋應有盡有，肉食選擇非常多。最後一晚隨性選一家</div>
+        <div class="rest-tags"><span class="tag-both">有非海鮮選項</span></div>
+        <div class="rest-price">約 1,500–3,000 JPY/人</div>
+      </div>
+      <div class="rest-card">
+        <div class="rest-header"><div class="rest-name">阪急百貨 B2 食品館</div><span class="rest-meal meal-both">伴手禮補充</span></div>
+        <div class="rest-desc">回國前最後採買。551蓬萊豚饅頭、りくろーおじさん起司蛋糕、自由軒咖哩飯包，大阪必帶伴手禮一次搞定</div>
+        <div class="rest-tags"><span class="tag-noseafood">無海鮮</span></div>
+        <div class="rest-price">依購買量而定</div>
+      </div>
+    </div>
+    <div class="note-card">
+      <div class="note-title">明日提醒</div>
+      <div class="note-text">7/28 回程 JX823 15:10起飛，<strong>12:00前</strong>出發前往關西機場。建議提前網路辦理登機。</div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-todo">
+    <div style="height:8px"></div>
+    <div style="font-size:14px; font-weight:500; color:#1A1A1A; margin-bottom:12px">預訂清單</div>
+    <div id="todo-list">
+      <div class="todo-item done" onclick="toggleTodo(this)">
+        <div class="todo-check"><div class="todo-check-inner"></div></div>
+        <div class="todo-body">
+          <div class="todo-text">丹後赤松號（WILLER，7/22）</div>
+          <div class="todo-sub">已預訂 · 800 JPY/人 · Bus No. 8771D</div>
+        </div>
+      </div>
+      <div class="todo-item" onclick="toggleTodo(this)">
+        <div class="todo-check"><div class="todo-check-inner"></div></div>
+        <div class="todo-body">
+          <div class="todo-text">京都→西舞鶴 JR特急（7/22）</div>
+          <div class="todo-sub">需趕上西舞鶴10:13，建議e5489或綠色窗口購票</div>
+        </div>
+      </div>
+      <div class="todo-item" onclick="toggleTodo(this)">
+        <div class="todo-check"><div class="todo-check-inner"></div></div>
+        <div class="todo-body">
+          <div class="todo-text">嵯峨野觀光小火車（7/23）</div>
+          <div class="todo-sub">⚠ 務必提前1個月！KKday 或嵯峨野官網</div>
+        </div>
+      </div>
+      <div class="todo-item" onclick="toggleTodo(this)">
+        <div class="todo-check"><div class="todo-check-inner"></div></div>
+        <div class="todo-body">
+          <div class="todo-text">保津川遊船（7/23）</div>
+          <div class="todo-sub">提前預訂</div>
+        </div>
+      </div>
+      <div class="todo-item" onclick="toggleTodo(this)">
+        <div class="todo-check"><div class="todo-check-inner"></div></div>
+        <div class="todo-body">
+          <div class="todo-text">祇園祭後祭觀覽席（7/24）</div>
+          <div class="todo-sub">Klook預購，免排隊，建議入手</div>
+        </div>
+      </div>
+      <div class="todo-item" onclick="toggleTodo(this)">
+        <div class="todo-check"><div class="todo-check-inner"></div></div>
+        <div class="todo-body">
+          <div class="todo-text">Klook包車 京都→大阪（7/25）</div>
+          <div class="todo-sub">11:00退房出發，4人行李直接帶走</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-pack">
+    <div style="height:8px"></div>
+    <div id="pack-progress-label" class="progress-label">0 / 0 完成</div>
+    <div class="progress-bar"><div class="progress-fill" id="pack-progress" style="width:0%"></div></div>
+    <div class="pack-section" id="pack-list">
+      <div class="pack-cat">證件 & 金融</div>
+      <div class="pack-item" onclick="togglePack(this)"><div class="pack-box"><svg class="pack-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="pack-text">護照（效期6個月以上）</div></div>
+      <div class="pack-item" onclick="togglePack(this)"><div class="pack-box"><svg class="pack-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="pack-text">Manaca 卡（確認餘額）</div></div>
+      <div class="pack-item" onclick="togglePack(this)"><div class="pack-box"><svg class="pack-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="pack-text">現金日幣（JPY）</div></div>
+      <div class="pack-item" onclick="togglePack(this)"><div class="pack-box"><svg class="pack-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="pack-text">信用卡</div></div>
+      <div class="pack-item" onclick="togglePack(this)"><div class="pack-box"><svg class="pack-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="pack-text">電子機票截圖</div></div>
+
+      <div class="pack-cat">電子 & 配件</div>
+      <div class="pack-item" onclick="togglePack(this)"><div class="pack-box"><svg class="pack-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="pack-text">手機 & 充電器</div></div>
+      <div class="pack-item" onclick="togglePack(this)"><div class="pack-box"><svg class="pack-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="pack-text">行動電源</div></div>
+      <div class="pack-item" onclick="togglePack(this)"><div class="pack-box"><svg class="pack-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="pack-text">相機（SD卡、備用電池）</div></div>
+      <div class="pack-item" onclick="togglePack(this)"><div class="pack-box"><svg class="pack-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="pack-text">網路（SIM卡或Wi-Fi分享器）</div></div>
+
+      <div class="pack-cat">夏季必備</div>
+      <div class="pack-item" onclick="togglePack(this)"><div class="pack-box"><svg class="pack-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="pack-text">防曬乳 SPF50+</div></div>
+      <div class="pack-item" onclick="togglePack(this)"><div class="pack-box"><svg class="pack-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="pack-text">折疊傘（防曬＋防雨）</div></div>
+      <div class="pack-item" onclick="togglePack(this)"><div class="pack-box"><svg class="pack-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="pack-text">散熱噴霧 / 涼感毛巾</div></div>
+      <div class="pack-item" onclick="togglePack(this)"><div class="pack-box"><svg class="pack-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="pack-text">透氣輕便衣物（多件）</div></div>
+      <div class="pack-item" onclick="togglePack(this)"><div class="pack-box"><svg class="pack-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="pack-text">舒適好走的鞋（走路多）</div></div>
+      <div class="pack-item" onclick="togglePack(this)"><div class="pack-box"><svg class="pack-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="pack-text">小背包（日間出遊用）</div></div>
+
+      <div class="pack-cat">醫藥 & 清潔</div>
+      <div class="pack-item" onclick="togglePack(this)"><div class="pack-box"><svg class="pack-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="pack-text">常備藥（腸胃藥、止痛藥）</div></div>
+      <div class="pack-item" onclick="togglePack(this)"><div class="pack-box"><svg class="pack-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="pack-text">OK繃 / 防磨腳貼</div></div>
+      <div class="pack-item" onclick="togglePack(this)"><div class="pack-box"><svg class="pack-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="pack-text">濕紙巾 / 消毒液</div></div>
+      <div class="pack-item" onclick="togglePack(this)"><div class="pack-box"><svg class="pack-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="pack-text">保濕面膜（冷氣房乾燥）</div></div>
+
+      <div class="pack-cat">伴手禮空間</div>
+      <div class="pack-item" onclick="togglePack(this)"><div class="pack-box"><svg class="pack-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="pack-text">折疊環保袋（買東西用）</div></div>
+      <div class="pack-item" onclick="togglePack(this)"><div class="pack-box"><svg class="pack-check" viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="pack-text">行李箱預留空間（回程買物）</div></div>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+
+</div>
+
+<script>
+const panels = ['flight','d1','d2','d3','d4','d5','d6','d7','todo','pack'];
+const tabColors = {flight:'active-flight',d1:'active-kyoto',d2:'active-kyoto',d3:'active-kyoto',d4:'active-kyoto',d5:'active-osaka',d6:'active-osaka',d7:'active-osaka',todo:'active-flight',pack:'active-osaka'};
+
+function show(id) {
+  panels.forEach(p => {
+    document.getElementById('panel-'+p).classList.remove('active');
+  });
+  document.getElementById('panel-'+id).classList.add('active');
+  const tabs = document.querySelectorAll('.tab-btn');
+  tabs.forEach(t => { t.className = 'tab-btn'; });
+  const idx = panels.indexOf(id);
+  if(idx >= 0) tabs[idx].classList.add(tabColors[id]);
+}
+
+function toggleTodo(el) {
+  el.classList.toggle('done');
+}
+
+function togglePack(el) {
+  el.classList.toggle('checked');
+  updateProgress();
+}
+
+function updateProgress() {
+  const items = document.querySelectorAll('.pack-item');
+  const done = document.querySelectorAll('.pack-item.checked').length;
+  const total = items.length;
+  document.getElementById('pack-progress').style.width = (done/total*100)+'%';
+  document.getElementById('pack-progress-label').textContent = done + ' / ' + total + ' 完成';
+}
+
+updateProgress();
+</script>
+</body>
+</html>
